@@ -1,7 +1,7 @@
 import os
 import boto3
 from botocore.exceptions import ClientError
-
+import requests
 s3 = boto3.resource('s3')
 ecr = boto3.client('ecr')
 code_commit = boto3.client('codecommit')
@@ -67,6 +67,23 @@ def check_codecommit(repo):
         print("Error Reason: \n{}\n".format(e))
         print("Please check 'CodeCommit Repository' is not available")
 
+
+def check_github(repo_url):
+    """
+    Checks to confirm that a GitHub Repository exists and is reachable.
+    """
+    try:
+        response = requests.get(repo_url)
+        if response.status_code == 200:
+            print("GitHub Repository: {} [".format(repo_url)+u'\u2714'+"]")
+        else:
+            print("GitHub Repository: {} [X]".format(repo_url))
+            print("HTTP Status: {}".format(response.status_code))
+    except Exception as e:
+        print("GitHub Repository: {} [X]".format(repo_url))
+        print("Error Reason: \n{}\n".format(e))
+
+
 def main():
     """
     Description:
@@ -78,7 +95,8 @@ def main():
     check_bucket(os.environ['DATA_BUCKET'])
     check_bucket(os.environ['PIPELINE_BUCKET'])
     check_ecr('abalone')
-    check_codecommit('mlops')
+    #check_codecommit('mlops')
+    check_github("https://github.com/Ir-Fadhli/mlpos")
 
 
 if __name__ == "__main__":
